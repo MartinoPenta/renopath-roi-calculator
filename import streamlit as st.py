@@ -6,8 +6,6 @@ st.set_page_config(
     layout="centered"
 )
 
-# ── Data ──────────────────────────────────────────────────────────────────────
-
 LOCATIONS = {
     "Copenhagen inner city (Nørrebro, Vesterbro, Østerbro)": {"base": 1.00, "density": "high"},
     "Copenhagen suburbs (Frederiksberg, Gentofte, Lyngby)":  {"base": 0.88, "density": "high"},
@@ -38,8 +36,6 @@ CONFIDENCE = {
     "low":    {"ci": 0.18, "note": "Low data density — fewer comparable sales in this area. Treat as indicative range only."},
 }
 
-# ── UI ────────────────────────────────────────────────────────────────────────
-
 st.markdown("## Renopath — renovation ROI calculator")
 st.caption("Powered by Danish renovation-adjusted repeat sales data · Not a formal valuation")
 
@@ -55,21 +51,21 @@ with col2:
 
 prop_val = st.slider(
     "Current market value (DKK)",
-    min_value=1_500_000,
-    max_value=8_000_000,
-    value=3_500_000,
-    step=100_000,
+    min_value=1500000,
+    max_value=8000000,
+    value=3500000,
+    step=100000,
     format="%d"
 )
 
-st.markdown(f"**{prop_val:,.0f} DKK**", help="Your estimate of the property's current market value before renovation.")
+st.markdown(f"**{prop_val:,.0f} DKK**")
 
 reno_cost = st.slider(
     "Estimated renovation cost (DKK)",
-    min_value=100_000,
-    max_value=1_500_000,
-    value=400_000,
-    step=25_000,
+    min_value=100000,
+    max_value=1500000,
+    value=400000,
+    step=25000,
     format="%d"
 )
 
@@ -87,8 +83,6 @@ for i, key in enumerate(work_keys):
             WORKS[key]["label"],
             value=key in ("energy", "kitchen")
         )
-
-# ── Calculation ───────────────────────────────────────────────────────────────
 
 loc = LOCATIONS[location_key]
 prop_mult = PROPERTY_TYPES[proptype_key]
@@ -126,15 +120,13 @@ ci = CONFIDENCE[loc["density"]]["ci"]
 low = round(post_val * (1 - ci))
 high = round(post_val * (1 + ci))
 
-# ── Output metrics ────────────────────────────────────────────────────────────
-
 m1, m2, m3 = st.columns(3)
 
 with m1:
     st.metric(
         label="Post-renovation value",
         value=f"{post_val:,.0f} DKK",
-        delta=f"+{uplift_pct:.0f}% on current value".replace("uplift_pct", str(round(total_uplift_pct * 100)))
+        delta=f"+{round(total_uplift_pct * 100)}% on current value"
     )
     st.caption(f"Range: {low:,.0f} – {high:,.0f} DKK")
 
@@ -154,8 +146,6 @@ with m3:
         delta_color="off"
     )
 
-# ── Breakdown ─────────────────────────────────────────────────────────────────
-
 st.divider()
 st.markdown("**Uplift by work category**")
 
@@ -172,8 +162,6 @@ for b in breakdown:
         st.markdown(f"**+{round(b['pct']*100)}%**")
         st.caption(f"+{round(prop_val * b['pct']):,.0f} DKK")
 
-# ── Confidence note ───────────────────────────────────────────────────────────
-
 st.divider()
 conf = CONFIDENCE[loc["density"]]
 if loc["density"] == "high":
@@ -185,6 +173,6 @@ else:
 
 st.caption(
     "Estimates based on renovation-adjusted repeat sales, Danish transaction data 2010–2024. "
-    "Confidence intervals ±10–18% depending on postcode data density. "
+    "Confidence intervals 10–18% depending on postcode data density. "
     "Not a formal valuation — for indicative purposes only."
 )
